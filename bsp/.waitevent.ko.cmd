@@ -1,0 +1,1 @@
+cmd_/home/zhangxp/bspthundersoft/bsp/waitevent.ko := ld -r -m elf_x86_64 -T ./scripts/module-common.lds --build-id  -o /home/zhangxp/bspthundersoft/bsp/waitevent.ko /home/zhangxp/bspthundersoft/bsp/waitevent.o /home/zhangxp/bspthundersoft/bsp/waitevent.mod.o

@@ -1,0 +1,1 @@
+cmd_/root/workdir/2016-04-28/04day/waitevent/waitevent.ko := ld -r -m elf_x86_64 -T /usr/src/linux-headers-3.13.0-65-generic/scripts/module-common.lds --build-id  -o /root/workdir/2016-04-28/04day/waitevent/waitevent.ko /root/workdir/2016-04-28/04day/waitevent/waitevent.o /root/workdir/2016-04-28/04day/waitevent/waitevent.mod.o

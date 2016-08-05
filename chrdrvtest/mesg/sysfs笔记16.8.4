@@ -1,0 +1,97 @@
+sysfs 虚拟文件系统
+#include <linux/sysfs.h>
+
+	sysfs是一个基于内存的文件系统，它的作用是将内核信息以文件的方式提供给用户程序使用。该文
+	件系统的目录层次结构严格按照内核的数据结构组织。除了二进制文件外（只有特殊场合才使用），
+	sysfs文件内容均以ASCII格式保存，且一个文件只保存一个数据，另外，一个文件不可大于一个内存
+	页（通常为4096字节）。
+
+	sysfs提供一种机制，使得可以显式的描述内核对象、对象属性及对象间关系。sysfs有两组接口，一
+	组针对内核，用于将设备映射到文件系统中，另一组针对用户程序，用于读取或操作这些设备。
+	
+	用ls –F <路径>命令来通过文件后缀查看文件类型。“/”表示文件夹，“@”表示链接，没有后缀就是文件。
+
+	对于 sysfs 中的每个目录（/sys/*），内核中都会存在一个对应的kobject，它是隐藏在sysfs虚拟文件系统后的机制。
+	每个kobject都输出一个或者多个属性，他们在目录中表现为文件，其中的内容由内核生成。	
+
+关键词：kobject（内核对象）在用户空间的显示为目录
+
+	当创建kobject的时候，会给它一系列属性，这些属性保存在 kobj_type 结构体中，成员如下：
+
+		struct kobj_type {
+			void (*release) (struct kobject *);
+			struct sysfs_ops *sysfs_ops;	//提供了实现这些属性的方法
+			struct attribute **default_attrs;	//该结构体成员保存了属性列表，用于创建该类型的每一个kobject
+		}
+
+		struct attrbute {
+			char *name;	//属性的名字（在sysfs目录中显示）
+			struct module *owner;	//指向模块的指针，该模块负责实现这些属性
+			mode_t mode;	//应用于属性的保护位，对于只读属性，mode通常时S_IRUGO
+		}
+
+		struct sysfs_ops {
+			ssize_t (*show) (struct kobject *kobj, struct attribute *attr, char *buffer);	
+			//该方法把指定的值编码后放入缓存区，把实际长度作为返回值返回
+			ssize_t (*store) (struct kobject *kobj, struct attribute *attr, const char *buffer, size_t size);
+			//对保存在缓冲区的数据解码，并调用各种实用的方法保存新值，放回实际解码的字节数
+		}
+
+关键词：attrbute（对象属性）在用户空间的显示为文件
+	    relationship（对象关系）在用户空间的显示为链接（Symbolic Link）
+
+目录介绍
+/sys/devices
+	这是内核对系统中所有设备的分层次表达模型，也是/sys文件系统管理设备的最重要的目录结构
+
+/sys/dev
+	这个目录下维护一个按字符设备和块设备的主次号码(major:minor)链接到真实的设备
+	(/sys/devices下)的符号链接文件
+	
+/sys/bus
+	这是内核设备按总线类型分层放置的目录结构， devices 中的所有设备都是连接于某种总线
+	之下，在这里的每一种具体总线之下可以找到每一个具体设备的符号链接，它也是构成 Linux 
+	统一设备模型的一部分
+
+/sys/class
+	这是按照设备功能分类的设备模型，如系统所有输入设备都会出现在/sys/class/input 之下，
+	而不论它们是以何种总线连接到系统。它也是构成 Linux 统一设备模型的一部分
+
+/sys/kernel
+	这里是内核所有可调整参数的位置，目前只有 uevent_helper, kexec_loaded, mm, 和新式
+	的 slab 分配器等几项较新的设计在使用它，其它内核可调整参数仍然位于sysctl
+	(/proc/sys/kernel) 接口中
+
+/sys/module
+	这里有系统中所有模块的信息，不论这些模块是以内联(inlined)方式编译到内核映像文件
+	(vmlinuz)中还是编译为外部模块(ko文件)，都可能会出现在/sys/module 中
+
+    编译为外部模块(ko文件)在加载后会出现对应的/sys/module/<module_name>/，并且在这个目
+	录下会出现一些属性文件和属性目录来表示此外部模块的一些信息，如版本号、加载状态、所提
+	供的驱动程序等
+    
+	编译为内联方式的模块则只在当它有非0属性的模块参数时会出现对应的/sys/module/<module_name>，
+	这些模块的可用参数会出现在/sys/modules/<modname>/parameters/<param_name> 中，
+        如/sys/module/printk/parameters/time这个可读写参数控制着内联模块printk在打印内核消息
+		时是否加上时间前缀
+        所有内联模块的参数也可以由"<module_name>.<param_name>=<value>"的形式写在内核启动参数
+		上，如启动内核时加上参数"printk.time=1"与向"/sys/module/printk/parameters/time"写入
+		1的效果相同
+    没有非0属性参数的内联模块不会出现于此
+
+/sys/power
+	这里是系统中电源选项，这个目录下有几个属性文件可以用于控制整个机器的电源状态，如可以向其中
+	写入控制命令让机器关机、重启等
+
+sysfs读写流程
+
+	sysfs与普通文件系统的最大差异是，sysfs不会申请任何内存空间来保存文件的内容。事实上再不对文
+	件操作时，文件是不存在的。只有用户读或写文件时，sysfs才会申请一页内存（只有一页），用于保
+	存将要读取的文件信息。如果作读操作，sysfs就会调用文件的父对象（文件夹kobject）的属性处理函
+	数kobject->ktype->sysfs_ops->show，然后通过show函数来调用包含该对象的外层设备（或驱动、总
+	线等）的属性的show函数来获取硬件设备的对应属性值，然后将该值拷贝到用户空间的buff，这样就完
+	成了读操作。写流程相似。
+
+
+
+

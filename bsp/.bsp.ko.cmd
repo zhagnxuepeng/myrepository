@@ -1,0 +1,1 @@
+cmd_/home/zhangxp/bspthundersoft/bsp/bsp.ko := ld -r -m elf_x86_64 -T ./scripts/module-common.lds --build-id  -o /home/zhangxp/bspthundersoft/bsp/bsp.ko /home/zhangxp/bspthundersoft/bsp/bsp.o /home/zhangxp/bspthundersoft/bsp/bsp.mod.o

@@ -1,0 +1,1 @@
+cmd_/home/simon/Project/chrdrvtest/bak/chrdrvtest1.ko := ld -r -m elf_x86_64 -T ./scripts/module-common.lds --build-id  -o /home/simon/Project/chrdrvtest/bak/chrdrvtest1.ko /home/simon/Project/chrdrvtest/bak/chrdrvtest1.o /home/simon/Project/chrdrvtest/bak/chrdrvtest1.mod.o

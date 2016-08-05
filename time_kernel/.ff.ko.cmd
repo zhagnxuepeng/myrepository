@@ -1,0 +1,1 @@
+cmd_/home/zhangxp/bspthundersoft/time_kernel/ff.ko := ld -r -m elf_x86_64 -T ./scripts/module-common.lds --build-id  -o /home/zhangxp/bspthundersoft/time_kernel/ff.ko /home/zhangxp/bspthundersoft/time_kernel/ff.o /home/zhangxp/bspthundersoft/time_kernel/ff.mod.o

@@ -1,0 +1,37 @@
+#include <stdio.h>
+#include <fcntl.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <sys/ioctl.h>
+
+int main(int argc, const char *argv[])
+{
+	int fd;
+	int cmd = atoi(argv[1]);
+	fd = open("/dev/led",O_RDONLY);
+	switch(cmd)
+	{
+	case A:
+		ioctl(fd,LED_TWO);
+		printf("---------A\n");
+		break;
+	case B:
+		printf("---------B\n");
+		ioctl(fd,LED_THREE);
+		break;
+	case C:
+		printf("---------C\n");
+		ioctl(fd,LED_FOUR);
+		break;
+	case D:
+		printf("---------D\n");
+		ioctl(fd,LED_FIFTH);
+		break;
+	case E:
+		printf("---------E\n");
+		ioctl(fd,LED_FIFTH);
+		break;
+	
+	}
+	return 0;
+}

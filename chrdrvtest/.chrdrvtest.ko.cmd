@@ -1,0 +1,1 @@
+cmd_/home/zhangxp/bspthundersoft/chrdrvtest/chrdrvtest.ko := ld -r -m elf_x86_64 -T ./scripts/module-common.lds --build-id  -o /home/zhangxp/bspthundersoft/chrdrvtest/chrdrvtest.ko /home/zhangxp/bspthundersoft/chrdrvtest/chrdrvtest.o /home/zhangxp/bspthundersoft/chrdrvtest/chrdrvtest.mod.o

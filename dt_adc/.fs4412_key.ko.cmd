@@ -1,0 +1,1 @@
+cmd_/root/workdir/2016-04-28/06day/dt_key/fs4412_key.ko := arm-none-linux-gnueabi-ld -EL -r  -T /root/fs4412/kernel/linux-3.14-fs4412/scripts/module-common.lds --build-id  -o /root/workdir/2016-04-28/06day/dt_key/fs4412_key.ko /root/workdir/2016-04-28/06day/dt_key/fs4412_key.o /root/workdir/2016-04-28/06day/dt_key/fs4412_key.mod.o

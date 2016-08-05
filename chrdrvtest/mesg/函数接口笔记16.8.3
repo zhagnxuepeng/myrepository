@@ -1,0 +1,44 @@
+定时器
+#include <linux/timer.h>
+
+    struct timer_list {  
+		/**/
+        unsigned long expires;             	//期望定时器执行的jiffies的值    
+        void (*function) (unsigned long);   //定时器到达时调用的函数 
+        unsigned long data;                	//传递给函数的参数，如果参数较多，捆绑成结构体，传递结构体指针
+										  	//将指针强转成（unsigned long）传入   
+
+                                                
+    void init_timer(struct timer_list *timer); 	//初始化定时器
+    struct timer_list TIMER_INITIALIZER(_function, _expires, _data);	//初始化的第二种方法
+
+	void add_timer(struct timer_list *timer);	//添加定时器
+	int del_timer(struct timer_list *timer);	//定时器到时之前想要删除，可以用它
+
+工作队列	
+#include <linux/workqueue.h>
+
+	struct workqueue_struct *create_workqueue(const char *name);	//创建一个工作队列
+	struct workqueue_struct *create_singlethread_workqueue(const char *name);	//单个工作线程使用它 
+
+    DECLARE_WORK(name, void (*function) (void *), void *data);	//提交之前，填充一个 work_struct 结构
+	INIT_WORK(struct work_struct *work, void (*function) (void *), void *data);	//在运行时构造work_struct结构体
+	PREPARE_WORK(struct work_struct *work, void (*function) (void *), void *data);	//修改结构体，用它
+
+	int queue_work(struct workqueue_struct *queue, struct work_struct *work);	//将work添加到给定的queue
+	int queue_delayed_work(struct workqueue_struct *queue, struct work_struct *work, unsigned long delay);	//工作会至少延迟规定的jiffies才被执行
+	
+	int cancel_delayed_work(struct work_struct *work);	//取消某个挂起的工作队列入口项
+	void flush_workqueue(struct workqueue_struct *queue);	//上个函数使用后为了确保工作函数不会在任何地方运行，使用该函数
+
+	void destroy_workqueue(struct workqueue_struct *queue);	//exit中使用，释放工作队列相关资源
+
+自旋锁
+#include <linux/spinlock.h>
+
+	spinlock_t my_lock = SPIN_LOCK_UNLOCKED;	//编译时（全局静态变量），对自旋锁的初始化
+	void spin_lock_init(spinlock_t *lock);	//在运行时，使用该函数初始化
+
+	void spin_lock(spinlock_t *lock);	//在进入临界区之前，获得锁的函数
+
+	void spin_unlock(spinlock_t *lock);	//出临界区后，释放锁

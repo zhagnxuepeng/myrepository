@@ -1,0 +1,1 @@
+cmd_/home/zhangxp/bspthundersoft/xianchen/ff.ko := ld -r -m elf_x86_64 -T ./scripts/module-common.lds --build-id  -o /home/zhangxp/bspthundersoft/xianchen/ff.ko /home/zhangxp/bspthundersoft/xianchen/ff.o /home/zhangxp/bspthundersoft/xianchen/ff.mod.o

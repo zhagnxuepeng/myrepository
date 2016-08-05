@@ -1,0 +1,1 @@
+cmd_/home/zhangxp/bspthundersoft/queue/ff.ko := ld -r -m elf_x86_64 -T ./scripts/module-common.lds --build-id  -o /home/zhangxp/bspthundersoft/queue/ff.ko /home/zhangxp/bspthundersoft/queue/ff.o /home/zhangxp/bspthundersoft/queue/ff.mod.o
